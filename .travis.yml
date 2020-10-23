@@ -1,0 +1,22 @@
+## Config file for automatic testing at travis-ci.com
+
+language: python
+python:
+  - "3.8"
+jobs:
+  include:
+    - name: "Linter"
+      before_script:
+        - pip install -q flake8
+      script:
+        - "flake8 file_handler_with_links tests"
+
+    - name: "File_handler_with_links test"
+      language: python
+      python:
+        - "3.8"
+      install:
+        - make install
+      script:
+        - make test
+
