@@ -1,6 +1,6 @@
-"""Main module."""
 import argparse
 import os
+from concurrent.futures import ThreadPoolExecutor
 
 import requests
 from requests.exceptions import (ConnectionError, HTTPError, Timeout,
@@ -9,18 +9,22 @@ from requests.exceptions import (ConnectionError, HTTPError, Timeout,
 WORK_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 
-def url_downloader(session: requests.Session, link: str) -> str:
+def url_downloader(session: requests.Session, link: str):
     """Gets data by reference"""
+
     try:
         response = session.get(link)
         if response.status_code == 200:
-            return response.text
+            data = response.text
+            if data:
+                save_to_file(link, data)
     except (ConnectionError, Timeout, TooManyRedirects, HTTPError) as error:
         print(f'{error} occurred while retrieving data from the link "{link}"')
 
 
 def save_to_file(link: str, data: str):
     """Saves data to .html file"""
+
     if not os.path.exists(os.path.join(WORK_DIRECTORY, "html_downloads")):
         raise FileExistsError("The catalog html_downloads doesn't exist")
     try:
@@ -36,19 +40,20 @@ def save_to_file(link: str, data: str):
               f'"{link}" the data was not saved.')
 
 
-def process_file_with_urls(path_to_file: str,):
-    """The function creates a request session,
+def process_file_with_urls(path_to_file):
+    """The function creates a request session, threads pool,
     processes the file with links line by line"""
+
     if not os.path.exists(path_to_file):
         raise FileExistsError("The file with URL doesn't exist")
 
     session = requests.Session()
-    with open(path_to_file, "r") as file:
-        for line in file:
-            link = line.rstrip()
-            data = url_downloader(session, link)
-            if data:
-                save_to_file(link, data)
+    threads = []
+    with ThreadPoolExecutor(max_workers=20) as executor:
+        with open(path_to_file, "r") as file:
+            for line in file:
+                link = line.rstrip()
+                threads.append(executor.submit(url_downloader, session, link))
 
 
 if __name__ == "__main__":
