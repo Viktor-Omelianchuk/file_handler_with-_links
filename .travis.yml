@@ -9,7 +9,7 @@ jobs:
       before_script:
         - pip install -q flake8
       script:
-        - "flake8 file_handler_with_links tests"
+        - "flake8 src tests"
 
     - name: "File_handler_with_links test"
       language: python

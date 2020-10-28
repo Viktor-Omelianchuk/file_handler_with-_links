@@ -9,12 +9,12 @@ from requests.exceptions import (ConnectionError, HTTPError, Timeout,
 WORK_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 
-def url_downloader(session: requests.Session, link: str) -> str:
+def url_downloader(session: requests.Session, link: str):
     """Gets data by reference"""
     try:
         response = session.get(link)
         if response.status_code == 200:
-            return response.text
+            return response
     except (ConnectionError, Timeout, TooManyRedirects, HTTPError) as error:
         print(f'{error} occurred while retrieving data from the link "{link}"')
 
@@ -48,7 +48,7 @@ def process_file_with_urls(path_to_file: str,):
             link = line.rstrip()
             data = url_downloader(session, link)
             if data:
-                save_to_file(link, data)
+                save_to_file(link, data.text)
 
 
 if __name__ == "__main__":
