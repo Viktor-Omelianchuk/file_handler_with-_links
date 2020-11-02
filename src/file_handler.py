@@ -22,7 +22,7 @@ def url_downloader(session: requests.Session, link: str):
 def save_to_file(link: str, data: str):
     """Saves data to .html file"""
     if not os.path.exists(os.path.join(WORK_DIRECTORY, "html_downloads")):
-        raise FileExistsError("The catalog html_downloads doesn't exist")
+        os.mkdir(os.path.join(WORK_DIRECTORY, 'html_downloads'))
     try:
         with open(
             os.path.join(

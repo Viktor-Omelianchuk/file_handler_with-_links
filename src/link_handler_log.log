@@ -1,0 +1,214 @@
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:b'2019', while processing the link 
+INFO:root:'NoneType' object has no attribute 'recv', while processing the link 
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:b'Conservatism', while processing the link 
+INFO:root:, while processing the link 
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:, while processing the link 
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred while retrieving data from the link "http://en.wikipedia.org/wiki/Portal_talk"
+INFO:root:'NoneType' object has no attribute 'text'
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred while retrieving data from the link 'http://en.wikipedia.org/wiki/Ron_Fowler'
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred while retrieving data from the link 'http://en.wikipedia.org/wiki/Recent_changes'
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred while retrieving data from the link 'http://en.wikipedia.org/wiki/Sanskrit_Wikipedia'
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred while retrieving data from the link 'http://en.wikipedia.org/wiki/Hungarian_Wikipedia'
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred while retrieving data from the link 'http://en.wikipedia.org/wiki/Basque_Wikipedia'
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred while retrieving data from the link 'http://en.wikipedia.org/wiki/Albanian_Wikipedia'
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred while retrieving data from the link 'http://en.wikipedia.org/wiki/Urdu_Wikipedia'
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred while retrieving data from the link 'http://en.wikipedia.org/wiki/Ossetian_Wikipedia'
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred while retrieving data from the link 'http://en.wikipedia.org/wiki/Yabem_language'
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
+INFO:root:write() argument must be str, not None
