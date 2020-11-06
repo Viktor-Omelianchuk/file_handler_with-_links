@@ -11,7 +11,6 @@ def parse_arguments():
         "-l",
         "--link",
         type=str,
-        required=True,
         help="Name of file with HTTP URLs from current directory",
     )
     parser.add_argument(
@@ -27,13 +26,12 @@ def parse_arguments():
         help="The number of url links that will be queued for processing",
     )
     parser.add_argument(
-        "-mw", "--max_worker", type=int, help="The humber of work threads"
+        "-mw", "--max_workers", type=int, help="The humber of work threads"
     )
     parser.add_argument(
         '-ll',
         '--logging_level',
         type=int,
-        default=20,
         help='level for logging module'
     )
     parser.add_argument(

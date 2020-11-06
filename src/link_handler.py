@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import logging
 import os
 import queue
@@ -46,13 +48,8 @@ def save_to_file(file_name: str, content: str, directory="html_downloads"):
             os.path.join(WORK_DIRECTORY, directory, f"{file_name}.html"), "w"
         ) as file:
             file.write(content)
-            return True
     except IOError as error:
-        logger.info(
-            f"{error}, while processing the link "
-            f'"{file_name}" the data was not saved.'
-        )
-    return
+        logger.info("%s occurred %s was not saved" % (error, file_name))
 
 
 def check_into_memcached(link: str, content: str):
@@ -64,13 +61,12 @@ def check_into_memcached(link: str, content: str):
     :return: True if block try worked correct, else False
     """
     try:
-        result = CACHE.get(link)
+        result = cache.get(link)
         if result is None or int(result) != hash(content):
-            CACHE.set(link, hash(content))
+            cache.set(link, hash(content))
             return True
     except Exception as error:
         logger.info(f"{error}, while processing the link ")
-    return
 
 
 class LinkHandler:
@@ -99,8 +95,8 @@ class LinkHandler:
                 return response.text
         except Exception as error:
             logger.info(
-                f"{error} occurred while "
-                f"retrieving data from the link '{link}'"
+                "%s occurred, no data received when processing the %s"
+                % (error, link)
             )
 
     def worker(self):
@@ -139,34 +135,28 @@ class LinkHandler:
 if __name__ == "__main__":
     args = parse_arguments()
 
-    logging.basicConfig(
-        level=args.logging_level, filename="link_handler_log.log"
-    )
-    logger = logging.getLogger()
-
     config = ConfigParser()
     config.read(args.config)
 
-    max_workers = (
-        int(args.max_worker)
-        if args.max_worker
-        else int(config["file_handler"]["max_workers"])
+    logging.basicConfig(
+        level=int(args.logging_level or config["logging"]["level"]),
+        filename="link_handler_log.log",
+    )
+    logger = logging.getLogger()
+
+    max_workers = int(
+        args.max_workers or config["file_handler"]["max_workers"]
     )
 
-    directory = (
-        args.directory
-        if args.directory
-        else config["file_handler"]["default_directory"]
+    number_of_links = int(
+        args.number_of_links or config["file_handler"]["number_of_links"]
     )
 
-    number_of_links = (
-        int(args.number_of_links)
-        if args.number_of_links
-        else int(config["file_handler"]["number_of_links"])
-    )
+    directory = args.directory or config["file_handler"]["default_directory"]
 
-    CACHE = PooledClient("127.0.0.1", max_pool_size=max_workers)
+    url_link = args.link or config["file_handler"]["url_link"]
 
-    if args.link:
-        wiki = LinkHandler(args.link)
-        wiki.runner()
+    cache = PooledClient(config["memcached"]["ip"], max_pool_size=max_workers)
+
+    wiki = LinkHandler(url_link)
+    wiki.runner()
