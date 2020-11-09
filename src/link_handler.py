@@ -1,14 +1,19 @@
 #!/usr/bin/python3
 
-import logging
+import logging.handlers
 import os
 import queue
 import re
+import sqlite3
+import time
 from concurrent.futures.thread import ThreadPoolExecutor
 from configparser import ConfigParser
+from syslog import LOG_LOCAL1
 
 import requests
 from pymemcache.client.base import PooledClient
+from retry import retry
+
 
 from cli import parse_arguments
 
@@ -69,6 +74,40 @@ def check_into_memcached(link: str, content: str):
         logger.info(f"{error}, while processing the link ")
 
 
+def timestamp_sql_chacker():
+    """
+    Funtction if is not database create db,
+    compare current timestamt with timesmamp in database
+
+    :return True: if current timestamp more 3600 seconds
+    than databases timestamp
+    """
+    global db
+    try:
+        db = sqlite3.connect("timestamp.db")
+        sql = db.cursor()
+        sql.execute(
+            """CREATE TABLE IF NOT EXISTS timestamp (
+                ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                TIME INTEGER)"""
+        )
+        db.commit()
+        for value in sql.execute("SELECT * FROM timestamp WHERE ID = 1"):
+            if int(time.time()) - value[1] >= 3600:
+                sql.execute(
+                    f"UPDATE timestamp SET TIME = {int(time.time())} "
+                    f"WHERE ID = 1"
+                )
+                db.commit()
+                return True
+
+    except sqlite3.Error as error:
+        logger.info("%s Error while working with SQLite" % error)
+    finally:
+        if db:
+            db.close()
+
+
 class LinkHandler:
     """
     Class for handling links.
@@ -83,6 +122,7 @@ class LinkHandler:
         self.max_workers = max_workers
         self.counter = 0
 
+    @retry(Exception, tries=2)
     def url_downloader(self, link: str) -> str:
         """Gets data by link
 
@@ -138,11 +178,15 @@ if __name__ == "__main__":
     config = ConfigParser()
     config.read(args.config)
 
-    logging.basicConfig(
-        level=int(args.logging_level or config["logging"]["level"]),
-        filename="link_handler_log.log",
+    logger = logging.getLogger('MyLogger')
+    logger.setLevel(
+        level=int(args.logging_level or config["logging"]["level"])
     )
-    logger = logging.getLogger()
+
+    handler = logging.handlers.SysLogHandler(address=("localhost", 8000),
+                                             facility=LOG_LOCAL1)
+
+    logger.addHandler(handler)
 
     max_workers = int(
         args.max_workers or config["file_handler"]["max_workers"]
@@ -158,5 +202,6 @@ if __name__ == "__main__":
 
     cache = PooledClient(config["memcached"]["ip"], max_pool_size=max_workers)
 
-    wiki = LinkHandler(url_link)
-    wiki.runner()
+    if timestamp_sql_chacker():
+        wiki = LinkHandler(url_link)
+        wiki.runner()

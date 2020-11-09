@@ -1,0 +1,17 @@
+[Unit]
+Description=link_handler - Handle links from wikipedia with saving content to html page
+After=syslog.target network.target memcached.service
+Requires=memcached.service 
+
+[Service]
+Type=simple
+PIDFile=/var/run/memcached/link_handler.pid
+ExecStart=/mnt/STORAGE/python_project/SS/first_task/file_handler_with_links/src/job.sh
+Restart=always
+RestartSec=15
+User=viktor
+
+
+[Install]
+WantedBy=multi-user.target
+

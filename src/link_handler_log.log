@@ -1,8 +1,0 @@
-INFO:root:HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred, no data received when processing the http://en.wikipedia.org/wiki/2020_in_New_Zealand
-INFO:root:HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. occurred, no data received when processing the http://en.wikipedia.org/wiki/Severe_acute_respiratory_syndrome_coronavirus_2
-INFO:root:HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred, no data received when processing the http://en.wikipedia.org/wiki/Cold_war
-INFO:root:HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred, no data received when processing the http://en.wikipedia.org/wiki/2020_in_Georgia_(country)
-INFO:root:HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred, no data received when processing the http://en.wikipedia.org/wiki/Elections_in_Myanmar
-INFO:root:HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred, no data received when processing the http://en.wikipedia.org/wiki/2020_Pacific_typhoon_season
-INFO:root:HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred, no data received when processing the http://en.wikipedia.org/wiki/Severe_acute_respiratory_syndrome_coronavirus_2
-INFO:root:HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred, no data received when processing the http://en.wikipedia.org/wiki/2009
