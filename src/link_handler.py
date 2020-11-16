@@ -15,7 +15,7 @@ from utils.utils import (
     links_extractor,
     timestamp_sql_chacker,
     check_into_memcached,
-    save_to_file,
+    save_to_file, cache_cold_start, save_url_links_to_database,
 )
 
 
@@ -66,7 +66,9 @@ class ThreadPoolLinkHandler:
 
     def runner(self):
         """Run links handler by thread"""
-
+        # cache cold start
+        if cache.stats()[b'total_items'] == 0:
+            cache_cold_start(cache, path_to_db, logger)
         while True:
             if timestamp_sql_chacker(path_to_db, logger):
                 html = self.url_downloader(self.url_link)
@@ -79,6 +81,10 @@ class ThreadPoolLinkHandler:
                 ) as executor:
                     for thread in range(self.max_workers):
                         threads.append(executor.submit(self.worker))
+                for url in urls:
+                    html_hash = cache.get(url)
+                    if html_hash is not None:
+                        save_url_links_to_database(path_to_db, url, int(html_hash), logger)
             time.sleep(int(config["sync"]["timeout"]))
 
 

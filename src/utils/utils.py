@@ -86,7 +86,22 @@ def check_into_memcached(
             return True
     except Exception as error:
         if logger:
-            logger.info(f"{error}, while processing the link ")
+            logger.info(f"{error}, while processing the link into memcached ")
+
+
+def create_connection_to_db(path_to_db, logger=None):
+    """ create a database connection to the SQLite database
+        specified by db_file
+    :param db_file: database file
+    :return: Connection object or None
+    """
+    conn = None
+    try:
+        conn = sqlite3.connect(path_to_db)
+    except sqlite3.Error as error:
+        if logger:
+            logger.info("%s Error while working with SQLite" % error)
+    return conn
 
 
 def timestamp_sql_chacker(path_to_db: str, logger=None):
@@ -99,7 +114,7 @@ def timestamp_sql_chacker(path_to_db: str, logger=None):
     """
     global db
     try:
-        db = sqlite3.connect(path_to_db)
+        db = create_connection_to_db(path_to_db)
         sql = db.cursor()
         sql.execute(
             """CREATE TABLE IF NOT EXISTS timestamp (
@@ -115,6 +130,60 @@ def timestamp_sql_chacker(path_to_db: str, logger=None):
                 )
                 db.commit()
                 return True
+    except sqlite3.Error as error:
+        if logger:
+            logger.info("%s Error while working with SQLite" % error)
+    finally:
+        if db:
+            db.close()
+
+
+def cache_cold_start(cache, path_to_db, logger=None):
+    try:
+        for value in get_url_links_from_database(path_to_db, logger):
+            cache.set(value[0], value[1])
+    except Exception as error:
+        if logger:
+            logger.info(f"{error}, while processing the link ")
+
+
+def save_url_links_to_database(path_to_db, url, html_hash, logger=None):
+    global db, sql
+    try:
+        db = create_connection_to_db(path_to_db)
+        sql = db.cursor()
+        sql.execute(
+            """CREATE TABLE IF NOT EXISTS links (
+                ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                LINK TEXT UNIQUE,
+                HASH INTEGER)"""
+
+        )
+        db.commit()
+        sql.execute(f"""INSERT INTO links (LINK, HASH) VALUES ('{url}', {html_hash})""")
+        db.commit()
+    except sqlite3.Error as error:
+        if 'UNIQUE' in str(error):
+            sql.execute(
+                f"""UPDATE links SET HASH = {html_hash} WHERE LINK = '{url}'"""
+            )
+            db.commit()
+            print(f'{url} was updated')
+        else:
+            if logger:
+                logger.info("%s Error while working with SQLite" % error)
+    finally:
+        if db:
+            db.close()
+
+
+def get_url_links_from_database(path_to_db, logger=None):
+    global db
+    try:
+        db = create_connection_to_db(path_to_db)
+        sql = db.cursor()
+        for value in sql.execute("SELECT * FROM timestamp"):
+            yield value
     except sqlite3.Error as error:
         if logger:
             logger.info("%s Error while working with SQLite" % error)

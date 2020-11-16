@@ -1,4 +1,6 @@
-INFO:root:'ClientResponse' object has no attribute 'status_code' occurred, no data received when processing the https://en.wikipedia.org/wiki/Portal:Current_events
 INFO:root:HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred, no data received when processing the http://en.wikipedia.org/wiki/2020_in_the_environment_and_environmental_sciences
-INFO:root:HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred, no data received when processing the http://en.wikipedia.org/wiki/2020_in_New_Zealand
-INFO:root:HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred, no data received when processing the http://en.wikipedia.org/wiki/2020_in_paleontology
+INFO:root:disk I/O error Error while working with SQLite
+INFO:root:can't concat int to bytes, while processing the link 
+INFO:root:can't concat int to bytes, while processing the link 
+INFO:root:can't concat int to bytes, while processing the link 
+INFO:root:HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred, no data received when processing the http://en.wikipedia.org/wiki/2020_in_the_environment_and_environmental_sciences
