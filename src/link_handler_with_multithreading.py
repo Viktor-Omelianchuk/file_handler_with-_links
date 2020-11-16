@@ -5,18 +5,15 @@ import queue
 import time
 from concurrent.futures.thread import ThreadPoolExecutor
 from configparser import ConfigParser
+from threading import Lock
 
 import requests
 from pymemcache.client.base import PooledClient
 
 from cli import parse_arguments
-from utils.utils import (
-    retry,
-    links_extractor,
-    timestamp_sql_chacker,
-    check_into_memcached,
-    save_to_file, cache_cold_start, save_url_links_to_database,
-)
+from utils.utils import (cache_cold_start, check_into_memcached,
+                         links_extractor, retry, save_to_file,
+                         save_url_links_to_database, timestamp_sql_chacker)
 
 
 class ThreadPoolLinkHandler:
@@ -49,18 +46,41 @@ class ThreadPoolLinkHandler:
                 % (error, link)
             )
 
+    def check_url_headers(self, link: str) -> str:
+        """Gets headers by link
+
+        :param link: (str), the link by which we will receive some headers
+        :return response: (str), text
+        """
+        try:
+            response = self.session.head(link, timeout=1)
+            if response.headers['Last-Modified']:
+                return response.headers['Last-Modified']
+        except Exception as error:
+            logger.info(
+                "%s occurred, no headers received when processing the %s"
+                % (error, link)
+            )
+
     def worker(self):
         """Handle links from queue"""
 
         while not self.queue.empty():
             try:
                 url_link = self.queue.get()
-                content = self.url_downloader(url_link)
-                if content and check_into_memcached(
-                    url_link, content, cache, logger
-                ):
-                    file_name = url_link.split("/")[-1]
-                    save_to_file(file_name, content, path_to_file_save)
+                last_modified = self.check_url_headers(url_link)
+                if check_into_memcached(url_link, last_modified, cache, logger):
+                    content = self.url_downloader(url_link)
+                    if content:
+                        file_name = url_link.split("/")[-1]
+                        save_to_file(file_name, content, path_to_file_save)
+                        lock = Lock()
+                        lock.acquire()
+                        try:
+                            save_url_links_to_database(path_to_db, url_link,
+                                                       last_modified, logger)
+                        finally:
+                            lock.release()
             except Exception as error:
                 logger.info(error)
 
@@ -81,10 +101,6 @@ class ThreadPoolLinkHandler:
                 ) as executor:
                     for thread in range(self.max_workers):
                         threads.append(executor.submit(self.worker))
-                for url in urls:
-                    html_hash = cache.get(url)
-                    if html_hash is not None:
-                        save_url_links_to_database(path_to_db, url, int(html_hash), logger)
             time.sleep(int(config["sync"]["timeout"]))
 
 
