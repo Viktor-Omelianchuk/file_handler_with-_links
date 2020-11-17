@@ -5,6 +5,7 @@ import queue
 import time
 from concurrent.futures.thread import ThreadPoolExecutor
 from configparser import ConfigParser
+from logging.config import fileConfig
 from threading import Lock
 
 import requests
@@ -54,7 +55,7 @@ class ThreadPoolLinkHandler:
         """
         try:
             response = self.session.head(link, timeout=1)
-            if response.headers['Last-Modified']:
+            if 'Last-Modified' in response.headers:
                 return response.headers['Last-Modified']
         except Exception as error:
             logger.info(
@@ -110,10 +111,8 @@ if __name__ == "__main__":
     config = ConfigParser()
     config.read(args.config)
 
-    logging.basicConfig(
-        level=int(args.logging_level or config["logging"]["level"]),
-        filename="link_handler_log.log",
-    )
+    fileConfig(
+        '../etc/logging_config_for_link_handler_with_multithreading.ini')
     logger = logging.getLogger()
 
     max_workers = int(

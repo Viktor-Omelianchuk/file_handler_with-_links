@@ -1,0 +1,1 @@
+2020-11-17 15:37:38,718 root         INFO     SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140491249145408 and this is thread id 140491223967296.

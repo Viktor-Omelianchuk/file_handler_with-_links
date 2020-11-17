@@ -38,7 +38,7 @@ def parse_arguments():
         '-c',
         '--config',
         type=str,
-        default='config.ini',
+        default='../etc/config.ini',
         help='config file for config parser'
     )
     global CONSOLE_ARGUMENTS
