@@ -6,15 +6,20 @@ import time
 from concurrent.futures.thread import ThreadPoolExecutor
 from configparser import ConfigParser
 from logging.config import fileConfig
-from threading import Lock
 
 import requests
 from pymemcache.client.base import PooledClient
 
 from cli import parse_arguments
-from utils.utils import (cache_cold_start, check_into_memcached,
-                         links_extractor, retry, save_to_file,
-                         save_url_links_to_database, timestamp_sql_chacker)
+from utils.utils import (
+    cache_cold_start,
+    check_into_memcached,
+    links_extractor,
+    retry,
+    save_to_file,
+    save_url_links_to_database,
+    timestamp_sql_checker,
+)
 
 
 class ThreadPoolLinkHandler:
@@ -29,6 +34,7 @@ class ThreadPoolLinkHandler:
         self.max_workers = max_workers
         self.session = requests.Session()
         self.queue = queue.Queue()
+        self.last_modified_for_db = list()
 
     @retry(delay=2, retries=2)
     def url_downloader(self, link: str) -> str:
@@ -55,8 +61,12 @@ class ThreadPoolLinkHandler:
         """
         try:
             response = self.session.head(link, timeout=1)
-            if 'Last-Modified' in response.headers:
-                return response.headers['Last-Modified']
+            if (
+                response.status_code == 200
+                and "Last-Modified" in response.headers
+                and response.headers["Last-Modified"]
+            ):
+                return response.headers["Last-Modified"]
         except Exception as error:
             logger.info(
                 "%s occurred, no headers received when processing the %s"
@@ -70,38 +80,41 @@ class ThreadPoolLinkHandler:
             try:
                 url_link = self.queue.get()
                 last_modified = self.check_url_headers(url_link)
-                if check_into_memcached(url_link, last_modified, cache, logger):
+                if last_modified and check_into_memcached(
+                    url_link, last_modified, cache, logger
+                ):
                     content = self.url_downloader(url_link)
                     if content:
                         file_name = url_link.split("/")[-1]
                         save_to_file(file_name, content, path_to_file_save)
-                        lock = Lock()
-                        lock.acquire()
-                        try:
-                            save_url_links_to_database(path_to_db, url_link,
-                                                       last_modified, logger)
-                        finally:
-                            lock.release()
+                        self.last_modified_for_db.append(
+                            (url_link, last_modified)
+                        )
+
             except Exception as error:
                 logger.info(error)
 
     def runner(self):
         """Run links handler by thread"""
         # cache cold start
-        if cache.stats()[b'total_items'] == 0:
+        if cache.stats()[b"total_items"] == 0:
             cache_cold_start(cache, path_to_db, logger)
         while True:
-            if timestamp_sql_chacker(path_to_db, logger):
+            if timestamp_sql_checker(path_to_db, logger):
                 html = self.url_downloader(self.url_link)
                 urls = links_extractor(html)
                 for link in urls:
                     self.queue.put(link)
-                threads = []
                 with ThreadPoolExecutor(
                     max_workers=self.max_workers
                 ) as executor:
                     for thread in range(self.max_workers):
-                        threads.append(executor.submit(self.worker))
+                        executor.submit(self.worker)
+                # add url and last modified date to database
+                save_url_links_to_database(
+                    path_to_db, self.last_modified_for_db, logger
+                )
+                self.last_modified_for_db.clear()
             time.sleep(int(config["sync"]["timeout"]))
 
 
@@ -112,7 +125,8 @@ if __name__ == "__main__":
     config.read(args.config)
 
     fileConfig(
-        '../etc/logging_config_for_link_handler_with_multithreading.ini')
+        "../etc/logging_config_for_link_handler_with_multithreading.ini"
+    )
     logger = logging.getLogger()
 
     max_workers = int(

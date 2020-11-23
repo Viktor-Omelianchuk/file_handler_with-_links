@@ -17,7 +17,7 @@ def parse_arguments():
         "-d",
         "--directory",
         type=str,
-        help="Name of directory where file will be save"
+        help="Name of directory where file will be save",
     )
     parser.add_argument(
         "-n",
@@ -29,17 +29,14 @@ def parse_arguments():
         "-mw", "--max_workers", type=int, help="The humber of work threads"
     )
     parser.add_argument(
-        '-ll',
-        '--logging_level',
-        type=int,
-        help='level for logging module'
+        "-ll", "--logging_level", type=int, help="level for logging module"
     )
     parser.add_argument(
-        '-c',
-        '--config',
+        "-c",
+        "--config",
         type=str,
-        default='../etc/config.ini',
-        help='config file for config parser'
+        default="../etc/config.ini",
+        help="config file for config parser",
     )
     global CONSOLE_ARGUMENTS
     CONSOLE_ARGUMENTS = parser.parse_args()

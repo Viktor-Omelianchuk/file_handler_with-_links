@@ -3,6 +3,7 @@ import re
 import sqlite3
 import time
 from functools import wraps
+
 from pymemcache import PooledClient
 
 
@@ -91,7 +92,7 @@ def check_into_memcached(
             logger.info(f"{error}, while processing the link into memcached ")
 
 
-def timestamp_sql_chacker(path_to_db: str, logger=None):
+def timestamp_sql_checker(path_to_db: str, logger=None):
     """
     Funtction if is not database create db,
     compare current timestamt with timesmamp in database
@@ -105,15 +106,15 @@ def timestamp_sql_chacker(path_to_db: str, logger=None):
         sql = db.cursor()
         sql.execute(
             """CREATE TABLE IF NOT EXISTS timestamp (
-                ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                TIME INTEGER)"""
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                time INTEGER)"""
         )
         db.commit()
         for value in sql.execute("SELECT * FROM timestamp WHERE ID = 1"):
             if int(time.time()) - value[1] >= 3600:
                 sql.execute(
-                    f"UPDATE timestamp SET TIME = {int(time.time())} "
-                    f"WHERE ID = 1"
+                    f"UPDATE timestamp SET time = {int(time.time())} "
+                    f"WHERE id = 1"
                 )
                 db.commit()
                 return True
@@ -139,13 +140,12 @@ def cache_cold_start(cache, path_to_db, logger=None):
             logger.info(f"{error}, while processing the link ")
 
 
-def save_url_links_to_database(path_to_db, url, last_modified, logger=None):
+def save_url_links_to_database(path_to_db, list_with_urls, logger=None):
     """The function saves url links and date of content last modified
     to database
 
     :param path_to_db: Path to database
-    :param url: Url link
-    :param last_modified: The date of content last modified
+    :param list_with_urls: List with contain pair url and date of last modified
     :param logger: Connect the logging module logging
     :return:
     """
@@ -155,26 +155,21 @@ def save_url_links_to_database(path_to_db, url, last_modified, logger=None):
         sql = db.cursor()
         sql.execute(
             """CREATE TABLE IF NOT EXISTS links (
-                ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                LINK TEXT UNIQUE,
-                MODIFIED INTEGER)"""
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                link TEXT UNIQUE,
+                modified INTEGER)"""
         )
         db.commit()
-        sql.execute(
-            f"""INSERT INTO links (LINK, MODIFIED)
-                VALUES ('{url}', '{last_modified}')"""
+        sql.executemany(
+            "INSERT OR REPLACE INTO links (link, modified) VALUES (?, ?)",
+            list_with_urls,
         )
+        print(sql.rowcount)
         db.commit()
+
     except sqlite3.Error as error:
-        if "UNIQUE" in str(error):
-            sql.execute(
-                f"""UPDATE links SET MODIFIED = '{last_modified}'
-                    WHERE LINK = '{url}'"""
-            )
-            db.commit()
-        else:
-            if logger:
-                logger.info("%s Error while working with SQLite" % error)
+        if logger:
+            logger.info("%s Error while working with SQLite" % error)
     finally:
         if db:
             db.close()

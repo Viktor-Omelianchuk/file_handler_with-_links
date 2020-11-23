@@ -74,3 +74,5 @@ install: clean ## install the package to the active Python's site-packages
 	python -m pip install --upgrade pip
 	python -m pip install -r requirements_dev.txt
 
+run: ## run local development server
+	uvicorn src.fastapi_app.main:app --reload
