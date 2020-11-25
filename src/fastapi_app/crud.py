@@ -5,18 +5,20 @@ from sqlalchemy.orm import Session
 from . import models, schema
 
 
-# def create_timestamp(db: Session, time: schema.TimestampCreate):
-#     db_timestamp = models.Timestamp(time=time.time)
-#     db.add(db_timestamp)
-#     db.commit()
-#     db.refresh(db_timestamp)
-#     return db_timestamp
+def create_timestamp(db: Session, time: schema.TimestampCreate):
+    db_timestamp = models.Timestamp(time=time.time)
+    db.add(db_timestamp)
+    db.commit()
+    db.refresh(db_timestamp)
+    return db_timestamp
 
 
 def update_timestamp(db: Session, time: int):
-    db.query(models.Timestamp).filter(models.Timestamp.id == 1).update({"time": time}, synchronize_session="evaluate")
+    db.query(models.Timestamp).filter(models.Timestamp.id == 1).update(
+        {"time": time}, synchronize_session="evaluate"
+    )
     db.commit()
-    return {'time': time}
+    return {"time": time}
 
 
 def get_urls(db: Session, skip: int = 0, limit: int = 100):
@@ -47,6 +49,7 @@ def delete_url(db: Session, url_id: int):
 
 def update_modified_date(db: Session, url_id: int, modified: str):
     db.query(models.Link).filter(models.Link.id == url_id).update(
-        {"modified": modified}, synchronize_session="evaluate")
+        {"modified": modified}, synchronize_session="evaluate"
+    )
     db.commit()
-    return {'modified': modified}
+    return {"modified": modified}

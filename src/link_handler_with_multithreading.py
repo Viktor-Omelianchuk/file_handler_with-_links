@@ -96,7 +96,6 @@ class ThreadPoolLinkHandler:
 
     def runner(self):
         """Run links handler by thread"""
-        # cache cold start
         if cache.stats()[b"total_items"] == 0:
             cache_cold_start(cache, path_to_db, logger)
         while True:

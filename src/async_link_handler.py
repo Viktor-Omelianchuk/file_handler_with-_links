@@ -14,7 +14,7 @@ from utils.utils import (
     check_into_memcached,
     save_to_file,
     save_url_links_to_database,
-    cache_cold_start,
+    cache_cold_start, timestamp_sql_checker,
 )
 
 
@@ -93,8 +93,13 @@ class AsyncioLinkHandler:
 
 
 async def main(url_link, max_workers):
-    async with AsyncioLinkHandler(url_link, max_workers) as new_wiki:
-        await new_wiki.runner()
+    if cache.stats()[b"total_items"] == 0:
+        cache_cold_start(cache, path_to_db, logger)
+    while True:
+        if timestamp_sql_checker(path_to_db, logger):
+            async with AsyncioLinkHandler(url_link, max_workers) as new_wiki:
+                await new_wiki.runner()
+        time.sleep(int(config["sync"]["timeout"]))
 
 
 if __name__ == "__main__":

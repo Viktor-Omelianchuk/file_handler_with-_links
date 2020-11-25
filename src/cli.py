@@ -1,8 +1,5 @@
 """Console script for link_handler."""
 import argparse
-import sys
-
-CONSOLE_ARGUMENTS = None
 
 
 def parse_arguments():
@@ -38,10 +35,10 @@ def parse_arguments():
         default="../etc/config.ini",
         help="config file for config parser",
     )
-    global CONSOLE_ARGUMENTS
-    CONSOLE_ARGUMENTS = parser.parse_args()
-    return CONSOLE_ARGUMENTS
+
+    console_arguments = parser.parse_args()
+    return console_arguments
 
 
 if __name__ == "__main__":
-    sys.exit(parse_arguments())
+    pass

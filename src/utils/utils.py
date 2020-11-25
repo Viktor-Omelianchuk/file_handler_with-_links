@@ -132,12 +132,18 @@ def cache_cold_start(cache, path_to_db, logger=None):
     :param path_to_db: Path to database
     :param logger: connect the logging module logging
     """
+    global db
     try:
-        for value in get_url_links_from_database(path_to_db, logger):
+        db = sqlite3.connect(path_to_db)
+        sql = db.cursor()
+        for value in sql.execute("SELECT * FROM links"):
             cache.set(value[0], value[1])
-    except Exception as error:
+    except sqlite3.Error as error:
         if logger:
-            logger.info(f"{error}, while processing the link ")
+            logger.info("%s Error while working with SQLite" % error)
+    finally:
+        if db:
+            db.close()
 
 
 def save_url_links_to_database(path_to_db, list_with_urls, logger=None):
@@ -167,26 +173,6 @@ def save_url_links_to_database(path_to_db, list_with_urls, logger=None):
         print(sql.rowcount)
         db.commit()
 
-    except sqlite3.Error as error:
-        if logger:
-            logger.info("%s Error while working with SQLite" % error)
-    finally:
-        if db:
-            db.close()
-
-
-def get_url_links_from_database(path_to_db, logger=None):
-    """The function with generator gives all data from database
-
-    :param path_to_db: Path to database
-    :param logger: Connect the logging module logging
-    """
-    global db
-    try:
-        db = sqlite3.connect(path_to_db)
-        sql = db.cursor()
-        for value in sql.execute("SELECT * FROM timestamp"):
-            yield value
     except sqlite3.Error as error:
         if logger:
             logger.info("%s Error while working with SQLite" % error)

@@ -21,17 +21,15 @@ def get_db():
         db.close()
 
 
-# @app.post("/timestamp", response_model=schema.Timestamp)
-# def create_timestamp(
-#     timestamp: schema.TimestampCreate, db: Session = Depends(get_db)
-# ):
-#     return crud.create_timestamp(db=db, time=timestamp)
+@app.post("/timestamp", response_model=schema.Timestamp)
+def create_timestamp(
+    timestamp: schema.TimestampCreate, db: Session = Depends(get_db)
+):
+    return crud.create_timestamp(db=db, time=timestamp)
 
 
 @app.put("/timestamp", response_model=schema.Timestamp)
-def update_timestamp(
-    timestamp: int, db: Session = Depends(get_db)
-):
+def update_timestamp(timestamp: int, db: Session = Depends(get_db)):
     logging.info(type(timestamp))
     return crud.update_timestamp(db=db, time=timestamp)
 
@@ -69,7 +67,9 @@ def delete_url(url_id: int, db: Session = Depends(get_db)):
 
 
 @app.put("/urls/{url_id}")
-def update_url_modified_date(url_id: int, modified: str, db: Session = Depends(get_db)):
+def update_url_modified_date(
+    url_id: int, modified: str, db: Session = Depends(get_db)
+):
     db_url = crud.get_url(db, url_id=url_id)
     if db_url:
         crud.update_modified_date(db, url_id=url_id, modified=modified)

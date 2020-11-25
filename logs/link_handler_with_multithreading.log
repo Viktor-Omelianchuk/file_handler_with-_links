@@ -400,3 +400,6 @@
 2020-11-23 10:08:37,600 root         INFO     HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred, no data received when processing the https://en.wikipedia.org/wiki/Boris_Johnson
 2020-11-23 10:14:43,035 root         INFO     can't concat int to bytes, while processing the link 
 2020-11-23 11:21:40,841 root         INFO     HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred, no headers received when processing the https://en.wikipedia.org/wiki/2020_North_Indian_Ocean_cyclone_season
+2020-11-23 18:51:54,570 root         INFO     HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred, no headers received when processing the https://en.wikipedia.org/wiki/Golf
+2020-11-23 18:51:57,257 root         INFO     HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred, no headers received when processing the https://en.wikipedia.org/wiki/Sebouh_Chouldjian
+2020-11-24 12:46:41,012 root         INFO     can't concat int to bytes, while processing the link 
