@@ -403,3 +403,55 @@
 2020-11-23 18:51:54,570 root         INFO     HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred, no headers received when processing the https://en.wikipedia.org/wiki/Golf
 2020-11-23 18:51:57,257 root         INFO     HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred, no headers received when processing the https://en.wikipedia.org/wiki/Sebouh_Chouldjian
 2020-11-24 12:46:41,012 root         INFO     can't concat int to bytes, while processing the link 
+2020-11-25 14:40:49,180 root         INFO     HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred, no headers received when processing the https://en.wikipedia.org/wiki/Elections_in_Egypt
+2020-11-25 14:40:49,217 root         INFO     HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred, no headers received when processing the https://en.wikipedia.org/wiki/2020_in_the_environment_and_environmental_sciences
+2020-11-25 14:40:52,764 root         INFO     HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred, no headers received when processing the https://en.wikipedia.org/wiki/Afghan_people
+2020-11-25 14:44:30,571 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:44:35,575 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:45:31,039 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:45:36,044 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:45:41,048 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:45:46,052 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:45:51,056 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:45:56,060 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:46:01,065 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:46:06,069 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:46:11,072 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:46:16,075 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:46:21,080 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:46:26,085 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:46:31,090 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:46:36,095 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:46:41,100 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:46:46,105 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:46:51,109 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:46:56,113 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:47:01,119 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:47:06,123 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:47:11,128 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:47:16,134 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:47:21,138 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:47:26,142 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:47:31,145 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:48:31,997 root         INFO     database is locked Error while working with SQLite
+2020-11-25 14:48:42,010 root         INFO     database is locked Error while working with SQLite
+2020-11-25 14:48:52,023 root         INFO     database is locked Error while working with SQLite
+2020-11-25 14:49:02,037 root         INFO     database is locked Error while working with SQLite
+2020-11-25 14:49:12,050 root         INFO     database is locked Error while working with SQLite
+2020-11-25 14:49:22,063 root         INFO     database is locked Error while working with SQLite
+2020-11-25 14:49:32,076 root         INFO     database is locked Error while working with SQLite
+2020-11-25 14:49:42,091 root         INFO     database is locked Error while working with SQLite
+2020-11-25 14:49:52,103 root         INFO     database is locked Error while working with SQLite
+2020-11-25 14:50:02,117 root         INFO     database is locked Error while working with SQLite
+2020-11-25 14:50:12,130 root         INFO     database is locked Error while working with SQLite
+2020-11-25 14:51:15,098 root         INFO     HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred, no headers received when processing the https://en.wikipedia.org/wiki/President_of_Russia
+2020-11-25 14:52:17,433 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:52:22,435 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:52:27,440 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:52:32,445 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:52:37,448 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:52:42,452 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-25 14:52:47,455 root         INFO     Cannot operate on a closed database. Error while working with SQLite
+2020-11-26 10:41:16,794 root         INFO     HTTPSConnectionPool(host='en.wikipedia.org', port=443): Read timed out. (read timeout=1) occurred, no headers received when processing the https://en.wikipedia.org/wiki/Karen_conflict
+2020-11-27 10:55:55,055 root         INFO     no such table: links Error while working with SQLite
+2020-11-30 16:09:55,519 root         INFO     no such table: links Error while working with SQLite

@@ -1,6 +1,7 @@
 import asyncio
 import logging.handlers
 import os
+import sqlite3
 import time
 from configparser import ConfigParser
 from logging.config import fileConfig
@@ -9,13 +10,9 @@ import aiohttp
 from pymemcache.client.base import PooledClient
 
 from cli import parse_arguments
-from utils.utils import (
-    links_extractor,
-    check_into_memcached,
-    save_to_file,
-    save_url_links_to_database,
-    cache_cold_start, timestamp_sql_checker,
-)
+from utils.utils import (cache_cold_start, check_into_memcached,
+                         links_extractor, save_to_file,
+                         save_url_links_to_database, timestamp_sql_checker)
 
 
 class AsyncioLinkHandler:
@@ -63,9 +60,6 @@ class AsyncioLinkHandler:
                 logger.info(error)
 
     async def runner(self):
-        # cache cold start
-        if cache.stats()[b"total_items"] == 0:
-            cache_cold_start(cache, path_to_db, logger)
         async with aiohttp.ClientSession() as session:
             html = await self.url_downloader(self.url_link, session)
             urls = links_extractor(html)
@@ -84,7 +78,7 @@ class AsyncioLinkHandler:
                 task.cancel()
             # add url and last modified date to database
             save_url_links_to_database(
-                path_to_db, self.last_modified_for_db, logger
+                db, self.last_modified_for_db, logger
             )
             self.last_modified_for_db.clear()
 
@@ -94,9 +88,9 @@ class AsyncioLinkHandler:
 
 async def main(url_link, max_workers):
     if cache.stats()[b"total_items"] == 0:
-        cache_cold_start(cache, path_to_db, logger)
+        cache_cold_start(cache, db, logger)
     while True:
-        if timestamp_sql_checker(path_to_db, logger):
+        if timestamp_sql_checker(db, logger):
             async with AsyncioLinkHandler(url_link, max_workers) as new_wiki:
                 await new_wiki.runner()
         time.sleep(int(config["sync"]["timeout"]))
@@ -128,6 +122,8 @@ if __name__ == "__main__":
     cache = PooledClient(config["memcached"]["ip"], max_pool_size=max_workers)
 
     path_to_db = config["db"]["path_to_db"]
+
+    db = sqlite3.connect(path_to_db)
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main(url_link, max_workers))

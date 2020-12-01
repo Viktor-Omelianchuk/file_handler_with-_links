@@ -92,17 +92,15 @@ def check_into_memcached(
             logger.info(f"{error}, while processing the link into memcached ")
 
 
-def timestamp_sql_checker(path_to_db: str, logger=None):
+def timestamp_sql_checker(db, logger=None):
     """
     Funtction if is not database create db,
     compare current timestamt with timesmamp in database
-
+    :param db: Connection to database
     :return True: if current timestamp more 3600 seconds
     than databases timestamp
     """
-    global db
     try:
-        db = sqlite3.connect(path_to_db)
         sql = db.cursor()
         sql.execute(
             """CREATE TABLE IF NOT EXISTS timestamp (
@@ -121,43 +119,33 @@ def timestamp_sql_checker(path_to_db: str, logger=None):
     except sqlite3.Error as error:
         if logger:
             logger.info("%s Error while working with SQLite" % error)
-    finally:
-        if db:
-            db.close()
 
 
-def cache_cold_start(cache, path_to_db, logger=None):
+def cache_cold_start(cache, db, logger=None):
     """The function fills the cache with data from the database
-    :param cache: Contion to pymemcached
-    :param path_to_db: Path to database
+    :param cache: Connection to pymemcached
+    :param db: Connection to database
     :param logger: connect the logging module logging
     """
-    global db
     try:
-        db = sqlite3.connect(path_to_db)
         sql = db.cursor()
         for value in sql.execute("SELECT * FROM links"):
-            cache.set(value[0], value[1])
+            cache.set(value[1], value[2])
     except sqlite3.Error as error:
         if logger:
             logger.info("%s Error while working with SQLite" % error)
-    finally:
-        if db:
-            db.close()
 
 
-def save_url_links_to_database(path_to_db, list_with_urls, logger=None):
+def save_url_links_to_database(db, list_with_urls, logger=None):
     """The function saves url links and date of content last modified
     to database
 
-    :param path_to_db: Path to database
+    :param db: Connection to database
     :param list_with_urls: List with contain pair url and date of last modified
     :param logger: Connect the logging module logging
     :return:
     """
-    global db, sql
     try:
-        db = sqlite3.connect(path_to_db)
         sql = db.cursor()
         sql.execute(
             """CREATE TABLE IF NOT EXISTS links (
@@ -170,15 +158,11 @@ def save_url_links_to_database(path_to_db, list_with_urls, logger=None):
             "INSERT OR REPLACE INTO links (link, modified) VALUES (?, ?)",
             list_with_urls,
         )
-        print(sql.rowcount)
         db.commit()
 
     except sqlite3.Error as error:
         if logger:
             logger.info("%s Error while working with SQLite" % error)
-    finally:
-        if db:
-            db.close()
 
 
 if __name__ == "__main__":

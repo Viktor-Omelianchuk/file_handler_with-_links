@@ -4,7 +4,7 @@ from unittest.mock import patch
 from cli import parse_arguments
 
 
-@patch('argparse.ArgumentParser')
+@patch("argparse.ArgumentParser")
 def test_command(mock_args):
     parse_arguments()
     mock_args().add_argument.assert_called()

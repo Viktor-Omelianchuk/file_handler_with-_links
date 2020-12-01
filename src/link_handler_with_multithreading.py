@@ -1,25 +1,20 @@
 #!/usr/bin/python3
-import logging.handlers
+import logging
 import os
-import queue
+import sqlite3
 import time
 from concurrent.futures.thread import ThreadPoolExecutor
 from configparser import ConfigParser
 from logging.config import fileConfig
+from queue import Queue
 
 import requests
 from pymemcache.client.base import PooledClient
 
 from cli import parse_arguments
-from utils.utils import (
-    cache_cold_start,
-    check_into_memcached,
-    links_extractor,
-    retry,
-    save_to_file,
-    save_url_links_to_database,
-    timestamp_sql_checker,
-)
+from utils.utils import (cache_cold_start, check_into_memcached,
+                         links_extractor, retry, save_to_file,
+                         save_url_links_to_database, timestamp_sql_checker)
 
 
 class ThreadPoolLinkHandler:
@@ -33,7 +28,7 @@ class ThreadPoolLinkHandler:
         self.url_link = url_link
         self.max_workers = max_workers
         self.session = requests.Session()
-        self.queue = queue.Queue()
+        self.queue = Queue()
         self.last_modified_for_db = list()
 
     @retry(delay=2, retries=2)
@@ -45,6 +40,7 @@ class ThreadPoolLinkHandler:
         """
         try:
             response = self.session.get(link, timeout=1)
+
             if response.status_code == 200:
                 return response.text
         except Exception as error:
@@ -75,7 +71,6 @@ class ThreadPoolLinkHandler:
 
     def worker(self):
         """Handle links from queue"""
-
         while not self.queue.empty():
             try:
                 url_link = self.queue.get()
@@ -90,16 +85,15 @@ class ThreadPoolLinkHandler:
                         self.last_modified_for_db.append(
                             (url_link, last_modified)
                         )
-
             except Exception as error:
                 logger.info(error)
 
     def runner(self):
         """Run links handler by thread"""
         if cache.stats()[b"total_items"] == 0:
-            cache_cold_start(cache, path_to_db, logger)
+            cache_cold_start(cache, db, logger)
         while True:
-            if timestamp_sql_checker(path_to_db, logger):
+            if timestamp_sql_checker(db, logger):
                 html = self.url_downloader(self.url_link)
                 urls = links_extractor(html)
                 for link in urls:
@@ -111,7 +105,7 @@ class ThreadPoolLinkHandler:
                         executor.submit(self.worker)
                 # add url and last modified date to database
                 save_url_links_to_database(
-                    path_to_db, self.last_modified_for_db, logger
+                    db, self.last_modified_for_db, logger
                 )
                 self.last_modified_for_db.clear()
             time.sleep(int(config["sync"]["timeout"]))
@@ -145,6 +139,8 @@ if __name__ == "__main__":
     cache = PooledClient(config["memcached"]["ip"], max_pool_size=max_workers)
 
     path_to_db = config["db"]["path_to_db"]
+
+    db = sqlite3.connect(path_to_db)
 
     wiki = ThreadPoolLinkHandler(url_link, max_workers)
     wiki.runner()

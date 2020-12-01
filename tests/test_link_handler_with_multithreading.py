@@ -1,6 +1,6 @@
 """Tests for src/link_handler_with_multithreading.py"""
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, Mock, MagicMock
 
 from link_handler_with_multithreading import ThreadPoolLinkHandler
 
@@ -11,18 +11,21 @@ class TestThreadPoolLinkHandler(unittest.TestCase):
         self.max_workers = 10
         self.wiki = ThreadPoolLinkHandler(self.link, self.max_workers)
 
-    @patch('requests.sessions.Session.get')
-    def test_url_downloader(self, mocked_session):
-        # attrs = {'status_code.return_value': 200, 'text': 'text'}
-        # mocked_session.configure_mock(**attrs)
-        self.wiki.url_downloader(self.link)
-        mocked_session.assert_called_once()
-        mocked_session.assert_called_once_with(self.link, timeout=1)
-        # assert mocked_session.status_code() == 200
-        # assert mocked_session.text == 'text'
+    @patch("link_handler_with_multithreading.requests.Session.get")
+    def test_url_downloader(self, mocked_get):
+        mocked_get.return_value = Mock(status_code=200, text="1")
+        result = self.wiki.url_downloader(self.link)
+        mocked_get.assert_called_with(self.link, timeout=1)
+        assert result == "1"
 
-    @patch('requests.sessions.Session.head')
-    def test_check_url_headers(self, mocked_session):
-        self.wiki.check_url_headers(self.link)
-        mocked_session.assert_called_once()
-        mocked_session.assert_called_once_with(self.link, timeout=1)
+    @patch("requests.sessions.Session.head")
+    def test_check_url_headers(self, mocked_head):
+        mocked_head.return_value.status_code = 200
+        mocked_head.return_value.headers = {'Last-Modified': 'some_date'}
+        result = self.wiki.check_url_headers(self.link)
+        mocked_head.assert_called_with(self.link, timeout=1)
+        assert result == 'some_date'
+
+
+
+
