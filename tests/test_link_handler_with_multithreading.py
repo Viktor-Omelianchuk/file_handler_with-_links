@@ -1,6 +1,6 @@
 """Tests for src/link_handler_with_multithreading.py"""
 import unittest
-from unittest.mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock
 
 from link_handler_with_multithreading import ThreadPoolLinkHandler
 
@@ -25,7 +25,3 @@ class TestThreadPoolLinkHandler(unittest.TestCase):
         result = self.wiki.check_url_headers(self.link)
         mocked_head.assert_called_with(self.link, timeout=1)
         assert result == 'some_date'
-
-
-
-

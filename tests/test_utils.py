@@ -1,6 +1,6 @@
 """Tests for src/utils/utils.py"""
-import sqlite3
 from unittest.mock import mock_open, patch
+
 from utils.utils import (
     links_extractor,
     save_to_file,
