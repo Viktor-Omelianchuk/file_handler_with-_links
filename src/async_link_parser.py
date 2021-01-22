@@ -1,4 +1,8 @@
+#!/usr/bin/python3
+"""Module for parsing url link"""
+
 import asyncio
+import json
 import logging.handlers
 import os
 import sqlite3
@@ -10,25 +14,44 @@ import aiohttp
 from pymemcache.client.base import PooledClient
 
 from cli import parse_arguments
-from utils.utils import (cache_cold_start, check_into_memcached,
-                         links_extractor, save_to_file,
-                         save_url_links_to_database, timestamp_sql_checker)
+from utils.utils import (
+    cache_cold_start,
+    update_cache,
+    links_extractor,
+    save_to_file,
+    save_url_links_to_database,
+    get_last_db_ts,
+    initial_db,
+)
+
+DEFAULT_CONFIG_PATH = "../etc/logging.json"
 
 
 class AsyncioLinkHandler:
+    """
+    Class for handling links.
+    Checks for other links after receiving data on the main link,
+    allows you to receive and save data on found links in multi-threaded mode
+    """
+
     def __init__(self, url_link, max_workers):
         self.url_link = url_link
         self.max_workers = max_workers
         self.queue = asyncio.Queue()
-        self.last_modified_for_db = list()
+        self.last_modified_for_db = []
 
     async def __aenter__(self):
         return self
 
     async def __aexit__(self, *args, **kwargs):
-        pass
+        logger.info("Finished")
 
     async def url_downloader(self, url, session):
+        """Gets data by link
+
+        :param url: (str), the link by which we will receive some content:
+        :return response: (str), text
+        """
         try:
             async with session.get(url) as response:
                 return await response.text()
@@ -39,35 +62,35 @@ class AsyncioLinkHandler:
             )
 
     async def worker(self, session):
+        """Handle links from queue"""
         while True:
             try:
                 url_link = await self.queue.get()
                 self.queue.task_done()
                 response = await session.head(url_link)
-                if "Last-Modified" in response.headers:
-                    last_modified = response.headers["Last-Modified"]
-                    if last_modified and check_into_memcached(
-                        url_link, last_modified, cache, logger
-                    ):
-                        content = await self.url_downloader(url_link, session)
-                        if content:
-                            file_name = url_link.split("/")[-1]
-                            save_to_file(file_name, content, path_to_file_save)
-                            self.last_modified_for_db.append(
-                                (url_link, last_modified)
-                            )
+                last_modified = response.headers.get("Last-Modified")
+                if last_modified and update_cache(
+                    url_link, last_modified, cache, logger
+                ):
+                    content = await self.url_downloader(url_link, session)
+                    if content:
+                        file_name = url_link.split("/")[-1]
+                        save_to_file(file_name, content, path_to_file_save)
+                        self.last_modified_for_db.append(
+                            (url_link, last_modified)
+                        )
             except Exception as error:
                 logger.info(error)
 
     async def runner(self):
+        """Run links handler with asyncio"""
         async with aiohttp.ClientSession() as session:
+            tasks = []
             html = await self.url_downloader(self.url_link, session)
             urls = links_extractor(html)
             # Put url into the queue.
             for url in urls:
                 self.queue.put_nowait(url)
-            # Create workers tasks to process the queue concurrently.
-            tasks = []
             for i in range(self.max_workers):
                 task = asyncio.create_task(self.worker(session))
                 tasks.append(task)
@@ -77,9 +100,7 @@ class AsyncioLinkHandler:
             for task in tasks:
                 task.cancel()
             # add url and last modified date to database
-            save_url_links_to_database(
-                db, self.last_modified_for_db, logger
-            )
+            save_url_links_to_database(db, self.last_modified_for_db, logger)
             self.last_modified_for_db.clear()
 
             # Wait until all worker tasks are cancelled.
@@ -90,7 +111,7 @@ async def main(url_link, max_workers):
     if cache.stats()[b"total_items"] == 0:
         cache_cold_start(cache, db, logger)
     while True:
-        if timestamp_sql_checker(db, logger):
+        if get_last_db_ts(db, logger):
             async with AsyncioLinkHandler(url_link, max_workers) as new_wiki:
                 await new_wiki.runner()
         time.sleep(int(config["sync"]["timeout"]))
@@ -102,8 +123,17 @@ if __name__ == "__main__":
     config = ConfigParser()
     config.read(args.config)
 
-    fileConfig("../etc/logging_config_for_async_link_handler.ini")
-    logger = logging.getLogger()
+    if os.path.exists(DEFAULT_CONFIG_PATH):
+        with open(DEFAULT_CONFIG_PATH, "rt") as f:
+            logger_config = json.load(f)
+            logger_config["loggers"]["main"][
+                "level"
+            ] = args.logging_level
+        logging.config.dictConfig(logger_config)
+    else:
+        logging.basicConfig(level=logging.INFO)
+
+    logger = logging.getLogger("main")
 
     max_workers = int(
         args.max_workers or config["file_handler"]["max_workers"]
@@ -124,6 +154,7 @@ if __name__ == "__main__":
     path_to_db = config["db"]["path_to_db"]
 
     db = sqlite3.connect(path_to_db)
+    initial_db(db, logger)
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main(url_link, max_workers))

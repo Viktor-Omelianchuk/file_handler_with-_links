@@ -4,10 +4,11 @@ from unittest.mock import mock_open, patch
 from utils.utils import (
     links_extractor,
     save_to_file,
-    check_into_memcached,
+    update_cache,
     cache_cold_start,
-    timestamp_sql_checker,
+    get_last_db_ts,
     save_url_links_to_database,
+    initial_db,
 )
 
 
@@ -40,28 +41,27 @@ def test_save_to_file(mocked_file):
     mocked_file().write.assert_called_once_with(content)
 
 
-@patch("link_handler_with_multithreading.PooledClient")
+@patch("link_parser.PooledClient")
 def test_check_into_memcached(mocked_cache):
     mocked_cache.get.return_value = None
     link = "http://en.wikipedia.org/wiki/Genus"
     last_modified = "Wed, 18 Nov 2020 04:46:06 GMT"
-    check_into_memcached(link, last_modified, mocked_cache)
+    update_cache(link, last_modified, mocked_cache)
     mocked_cache.get.assert_called_once_with(link)
     mocked_cache.set.assert_called_once_with(link, last_modified)
 
 
-@patch("link_handler_with_multithreading.sqlite3.connect")
-def test_timestamp_sql_checker(mocked_connect):
-    timestamp_sql_checker(mocked_connect)
+@patch("link_parser.sqlite3.connect")
+def test_get_last_db_ts(mocked_connect):
+    get_last_db_ts(mocked_connect)
     mocked_connect.cursor().execute.assert_called()
     mocked_connect.cursor().execute.assert_called_with(
         "SELECT * FROM timestamp WHERE ID = 1"
     )
-    mocked_connect.commit.assert_called()
 
 
-@patch("link_handler_with_multithreading.sqlite3.connect")
-@patch("link_handler_with_multithreading.PooledClient")
+@patch("link_parser.sqlite3.connect")
+@patch("link_parser.PooledClient")
 def test_cache_cold_start(mocked_cache, mocked_sqlite):
     mocked_sqlite.cursor().execute.return_value = [(1, 2, 3)]
     cache_cold_start(mocked_cache, mocked_sqlite)
@@ -69,19 +69,13 @@ def test_cache_cold_start(mocked_cache, mocked_sqlite):
     mocked_cache.set.assert_called()
 
 
-@patch("link_handler_with_multithreading.sqlite3.connect")
+@patch("link_parser.sqlite3.connect")
 def test_save_url_links_to_database(mocked_connect):
     list_with_urls = [
         ("link", "modified"),
     ]
     save_url_links_to_database(mocked_connect, list_with_urls)
     mocked_connect.cursor.assert_called_once()
-    mocked_connect.cursor().execute.assert_called_with(
-        """CREATE TABLE IF NOT EXISTS links (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                link TEXT UNIQUE,
-                modified INTEGER)"""
-    )
     mocked_connect.cursor().executemany.assert_called_with(
         "INSERT OR REPLACE INTO links (link, modified) VALUES (?, ?)",
         list_with_urls,
@@ -89,5 +83,14 @@ def test_save_url_links_to_database(mocked_connect):
     mocked_connect.commit.assert_called()
 
 
-if __name__ == "__main__":
-    pass
+@patch("link_parser.sqlite3.connect")
+def test_initial_db(mocked_connect):
+    initial_db(mocked_connect)
+    mocked_connect.cursor.assert_called_once()
+    mocked_connect.cursor().execute.assert_called_with(
+        """CREATE TABLE IF NOT EXISTS links (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                link TEXT UNIQUE,
+                modified INTEGER)"""
+    )
+    mocked_connect.commit.assert_called()

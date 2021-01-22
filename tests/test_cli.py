@@ -12,7 +12,7 @@ def test_command(mock_args):
         "-l",
         "--link",
         type=str,
-        help="Name of file with HTTP URLs from current directory",
+        help="URL link to Wikipedia page",
     )
     mock_args().add_argument.assert_any_call(
         "-d",
@@ -22,15 +22,19 @@ def test_command(mock_args):
     )
     mock_args().add_argument.assert_any_call(
         "-n",
-        "--number_of_links",
+        "--number-of-links",
         type=int,
         help="The number of url links that will be queued for processing",
     )
     mock_args().add_argument.assert_any_call(
-        "-mw", "--max_workers", type=int, help="The humber of work threads"
+        "-mw", "--max-workers", type=int, help="The humber of work threads"
     )
     mock_args().add_argument.assert_any_call(
-        "-ll", "--logging_level", type=int, help="level for logging module"
+        "-ll",
+        "--logging-level",
+        type=str,
+        default="INFO",
+        help="level for logging module",
     )
     mock_args().add_argument.assert_any_call(
         "-c",

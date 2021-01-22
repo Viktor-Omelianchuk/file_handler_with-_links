@@ -1,14 +1,18 @@
-"""Console script for link_handler."""
+"""Module for parsing CLI args"""
 import argparse
 
 
 def parse_arguments():
+    """
+    Parse CLI args
+    :return: (argparse.Namespace) List of arguments value
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-l",
         "--link",
         type=str,
-        help="Name of file with HTTP URLs from current directory",
+        help="URL link to Wikipedia page",
     )
     parser.add_argument(
         "-d",
@@ -18,15 +22,19 @@ def parse_arguments():
     )
     parser.add_argument(
         "-n",
-        "--number_of_links",
+        "--number-of-links",
         type=int,
         help="The number of url links that will be queued for processing",
     )
     parser.add_argument(
-        "-mw", "--max_workers", type=int, help="The humber of work threads"
+        "-mw", "--max-workers", type=int, help="The humber of work threads"
     )
     parser.add_argument(
-        "-ll", "--logging_level", type=int, help="level for logging module"
+        "-ll",
+        "--logging-level",
+        type=str,
+        default="INFO",
+        help="level for logging module",
     )
     parser.add_argument(
         "-c",
@@ -36,9 +44,4 @@ def parse_arguments():
         help="config file for config parser",
     )
 
-    console_arguments = parser.parse_args()
-    return console_arguments
-
-
-if __name__ == "__main__":
-    pass
+    return parser.parse_args()

@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+"""Module for parsing url link"""
+import json
 import logging
 import os
 import sqlite3
@@ -12,9 +14,25 @@ import requests
 from pymemcache.client.base import PooledClient
 
 from cli import parse_arguments
-from utils.utils import (cache_cold_start, check_into_memcached,
-                         links_extractor, retry, save_to_file,
-                         save_url_links_to_database, timestamp_sql_checker)
+from utils.utils import (
+    cache_cold_start,
+    update_cache,
+    links_extractor,
+    retry,
+    save_to_file,
+    save_url_links_to_database,
+    get_last_db_ts,
+    initial_db,
+)
+
+
+DEFAULT_CONFIG_PATH = "../etc/logging.json"
+
+
+class MissingModifiedHeaderException(Exception):
+    """This exceptions will be raise when """
+
+    pass
 
 
 class ThreadPoolLinkHandler:
@@ -29,7 +47,7 @@ class ThreadPoolLinkHandler:
         self.max_workers = max_workers
         self.session = requests.Session()
         self.queue = Queue()
-        self.last_modified_for_db = list()
+        self.fetched_links = []
 
     @retry(delay=2, retries=2)
     def url_downloader(self, link: str) -> str:
@@ -44,7 +62,7 @@ class ThreadPoolLinkHandler:
             if response.status_code == 200:
                 return response.text
         except Exception as error:
-            logger.info(
+            logger.error(
                 "%s occurred, no data received when processing the %s"
                 % (error, link)
             )
@@ -57,16 +75,12 @@ class ThreadPoolLinkHandler:
         """
         try:
             response = self.session.head(link, timeout=1)
-            if (
-                response.status_code == 200
-                and "Last-Modified" in response.headers
-                and response.headers["Last-Modified"]
-            ):
-                return response.headers["Last-Modified"]
+            if response.ok:
+                return response.headers.get("Last-Modified")
         except Exception as error:
-            logger.info(
-                "%s occurred, no headers received when processing the %s"
-                % (error, link)
+            raise MissingModifiedHeaderException(
+                f"{error} occurred, no headers received "
+                f"when processing the {link}"
             )
 
     def worker(self):
@@ -75,25 +89,26 @@ class ThreadPoolLinkHandler:
             try:
                 url_link = self.queue.get()
                 last_modified = self.check_url_headers(url_link)
-                if last_modified and check_into_memcached(
+                if last_modified and update_cache(
                     url_link, last_modified, cache, logger
                 ):
                     content = self.url_downloader(url_link)
                     if content:
                         file_name = url_link.split("/")[-1]
                         save_to_file(file_name, content, path_to_file_save)
-                        self.last_modified_for_db.append(
-                            (url_link, last_modified)
-                        )
+                        self.fetched_links.append((url_link, last_modified))
+            except MissingModifiedHeaderException as error:
+                logger.debug(error)
             except Exception as error:
-                logger.info(error)
+                logger.error(error)
 
     def runner(self):
         """Run links handler by thread"""
+
         if cache.stats()[b"total_items"] == 0:
             cache_cold_start(cache, db, logger)
         while True:
-            if timestamp_sql_checker(db, logger):
+            if get_last_db_ts(db, logger):
                 html = self.url_downloader(self.url_link)
                 urls = links_extractor(html)
                 for link in urls:
@@ -104,23 +119,27 @@ class ThreadPoolLinkHandler:
                     for thread in range(self.max_workers):
                         executor.submit(self.worker)
                 # add url and last modified date to database
-                save_url_links_to_database(
-                    db, self.last_modified_for_db, logger
-                )
-                self.last_modified_for_db.clear()
+                save_url_links_to_database(db, self.fetched_links, logger)
+                self.fetched_links.clear()
             time.sleep(int(config["sync"]["timeout"]))
 
 
 if __name__ == "__main__":
     args = parse_arguments()
-
     config = ConfigParser()
     config.read(args.config)
 
-    fileConfig(
-        "../etc/logging_config_for_link_handler_with_multithreading.ini"
-    )
-    logger = logging.getLogger()
+    if os.path.exists(DEFAULT_CONFIG_PATH):
+        with open(DEFAULT_CONFIG_PATH, "rt") as f:
+            logger_config = json.load(f)
+            logger_config["loggers"]["main"][
+                "level"
+            ] = args.logging_level
+        logging.config.dictConfig(logger_config)
+    else:
+        logging.basicConfig(level=logging.INFO)
+
+    logger = logging.getLogger("main")
 
     max_workers = int(
         args.max_workers or config["file_handler"]["max_workers"]
@@ -141,6 +160,7 @@ if __name__ == "__main__":
     path_to_db = config["db"]["path_to_db"]
 
     db = sqlite3.connect(path_to_db)
+    initial_db(db, logger)
 
     wiki = ThreadPoolLinkHandler(url_link, max_workers)
     wiki.runner()

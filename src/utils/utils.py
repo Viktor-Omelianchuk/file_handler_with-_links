@@ -1,3 +1,5 @@
+"""Module with additional functions"""
+
 import os
 import re
 import sqlite3
@@ -67,10 +69,10 @@ def save_to_file(
             file.write(content)
     except IOError as error:
         if logger:
-            logger.info("%s occurred %s was not saved" % (error, file_name))
+            logger.error("%s occurred %s was not saved" % (error, file_name))
 
 
-def check_into_memcached(
+def update_cache(
     link: str, last_modified: str, cache: PooledClient, logger=None
 ):
     """
@@ -83,19 +85,19 @@ def check_into_memcached(
     :return: True if block try worked correct, else False
     """
     try:
-        result = cache.get(link)
-        if result is None or result.decode("utf-8") != last_modified:
-            cache.set(link, last_modified)
-            return True
+        if last_modified:
+            result = cache.get(link)
+            if result is None or result.decode("utf-8") != last_modified:
+                cache.set(link, last_modified)
+                return True
     except Exception as error:
         if logger:
-            logger.info(f"{error}, while processing the link into memcached ")
+            logger.error(f"{error}, while processing the link into memcached ")
 
 
-def timestamp_sql_checker(db, logger=None):
+def initial_db(db, logger=None):
     """
     Funtction if is not database create db,
-    compare current timestamt with timesmamp in database
     :param db: Connection to database
     :return True: if current timestamp more 3600 seconds
     than databases timestamp
@@ -108,6 +110,35 @@ def timestamp_sql_checker(db, logger=None):
                 time INTEGER)"""
         )
         db.commit()
+
+        sql.execute(
+            f"INSERT OR REPLACE INTO timestamp (id, time) "
+            f"VALUES (1, {int(time.time()) - 3700})"
+        )
+        db.commit()
+
+        sql.execute(
+            """CREATE TABLE IF NOT EXISTS links (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                link TEXT UNIQUE,
+                modified INTEGER)"""
+        )
+        db.commit()
+
+    except sqlite3.Error as error:
+        if logger:
+            logger.error("%s Error while working with SQLite" % error)
+
+
+def get_last_db_ts(db, logger=None):
+    """
+    Funtction compare current timestamt with timesmamp in database
+    :param db: Connection to database
+    :return True: if current timestamp more 3600 seconds
+    than databases timestamp
+    """
+    try:
+        sql = db.cursor()
         for value in sql.execute("SELECT * FROM timestamp WHERE ID = 1"):
             if int(time.time()) - value[1] >= 3600:
                 sql.execute(
@@ -118,7 +149,7 @@ def timestamp_sql_checker(db, logger=None):
                 return True
     except sqlite3.Error as error:
         if logger:
-            logger.info("%s Error while working with SQLite" % error)
+            logger.error("%s Error while working with SQLite" % error)
 
 
 def cache_cold_start(cache, db, logger=None):
@@ -133,7 +164,7 @@ def cache_cold_start(cache, db, logger=None):
             cache.set(value[1], value[2])
     except sqlite3.Error as error:
         if logger:
-            logger.info("%s Error while working with SQLite" % error)
+            logger.error("%s Error while working with SQLite" % error)
 
 
 def save_url_links_to_database(db, list_with_urls, logger=None):
@@ -147,13 +178,6 @@ def save_url_links_to_database(db, list_with_urls, logger=None):
     """
     try:
         sql = db.cursor()
-        sql.execute(
-            """CREATE TABLE IF NOT EXISTS links (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                link TEXT UNIQUE,
-                modified INTEGER)"""
-        )
-        db.commit()
         sql.executemany(
             "INSERT OR REPLACE INTO links (link, modified) VALUES (?, ?)",
             list_with_urls,
@@ -162,8 +186,4 @@ def save_url_links_to_database(db, list_with_urls, logger=None):
 
     except sqlite3.Error as error:
         if logger:
-            logger.info("%s Error while working with SQLite" % error)
-
-
-if __name__ == "__main__":
-    pass
+            logger.error("%s Error while working with SQLite" % error)
